@@ -4,6 +4,9 @@
 // https://github.com/propublica/column-setter
 // ------------------------------------------------------------
 
+@use "sass:math";
+@use "sass:list";
+
 $mar-init: $mar;
 $col-init: $col;
 $gut-init: $gut;
@@ -126,7 +129,7 @@ $more-info: "Learn more: https://github.com/propublica/column-setter";
 			$result: $result * 10 + map-get($numbers, $character);  
 		} @else {
 			$digits: $digits * 10;
-			$result: $result + map-get($numbers, $character) / $digits;
+			$result: $result + math.div(map-get($numbers, $character), $digits);
 		}
 	}
 	@return if($minus, -$result, $result);;
@@ -141,7 +144,7 @@ $more-info: "Learn more: https://github.com/propublica/column-setter";
 
 @function strip-unit($number) {
 	@if type-of($number) == "number" and not unitless($number) {
-		@return $number / ($number * 0 + 1);
+		@return math.div($number, $number * 0 + 1);
 	}
 	@return $number;
 }
@@ -212,7 +215,7 @@ $property-settings-lesson: "$mar, $col, $gut, and $pad must each have a numeric 
 						}
 					} @else if $addgut == true { // If gutters are fluid width and a gutter is added to the target width
 						@if unitless($col) { // If columns are fluid width
-							$addgutAmount: percentage($gut / fluid-width($container));
+							$addgutAmount: percentage(math.div($gut, fluid-width($container)));
 						} @else { // If columns are fixed width
 							$addgutAmount: 1;
 						}
@@ -239,13 +242,13 @@ $property-settings-lesson: "$mar, $col, $gut, and $pad must each have a numeric 
 						@if $pad == 0 { // If the padding value is 0
 							@return 0;
 						} @else if not unitless($pad) { // If padding is fixed width
-							@return $pad * $negAmount / $divAmount;
+							@return math.div($pad * $negAmount, $divAmount);
 						} @else if unitless($col) and unitless($gut) { // If padding, columns, and gutters are fluid width
-							@return percentage($pad / fluid-width($container)) * $negAmount / $divAmount;
+							@return math.div(percentage(math.div($pad, fluid-width($container))) * $negAmount, $divAmount);
 						} @else if unitless($col) { // If padding and columns are fluid width and gutters are fixed width
-							@return calc(#{$divOpen}#{$negOpen}((100% - #{$gut * ($container - 1)}) / #{$container}) * #{$pad / $col}#{$negClose}#{$divClose});
+							@return calc(#{$divOpen}#{$negOpen}(list.slash((100% - #{$gut * ($container - 1)}), $container)) * #{math.div($pad, $col)}#{$negClose}#{$divClose});
 						} @else if unitless($gut) { // If padding and gutters are fluid width and columns are fixed width
-							@return calc(#{$divOpen}#{$negOpen}((100% - #{$col * $container}) / #{$container - 1}) * #{$pad / $gut}#{$negClose}#{$divClose});
+							@return calc(#{$divOpen}#{$negOpen}(list.slash((100% - #{$col * $container}), $container - 1)) * #{math.div($pad, $gut)}#{$negClose}#{$divClose});
 						} @else { // If padding is fluid width and columns and gutters are fixed width
 							@warn "For padding to be fluid width, columns and/or gutters must also be fluid width. " + $more-info;
 							@return 0;
@@ -254,25 +257,25 @@ $property-settings-lesson: "$mar, $col, $gut, and $pad must each have a numeric 
 						@if $gut == 0 { // If the gutter value is 0
 							@return 0;
 						} @else if not unitless($gut) { // If gutters are fixed width
-							@return $gut * $negAmount / $divAmount;
+							@return math.div($gut * $negAmount, $divAmount);
 						} @else if unitless($col) { // If gutters and columns are fluid width
-							@return (percentage($gut / fluid-width($container)) + $addgutAmount) * $negAmount / $divAmount;
+							@return math.div((percentage(math.div($gut, fluid-width($container))) + $addgutAmount) * $negAmount, $divAmount);
 						} @else { // If gutters are fluid width and columns are fixed width
 							@return calc(#{$divOpen}#{$negOpen}(100% - #{$col * $container}) / #{$container - 1}#{$negClose}#{$divClose});
 						}
 					} @else if type-of($target) == number and unitless($target) { // If the target is a unitless number
 						@if not unitless($col) { // If columns are fixed width
 							@if unitless($gut) { // If gutters are fluid width
-								@return calc(#{$divOpen}#{$negOpen}(((100% - #{$col * $container}) / #{$container - 1}) * #{$target - 1 + $addgutAmount}) + #{$col * $target}#{$negClose}#{$divClose});
+								@return calc(#{$divOpen}#{$negOpen}(list.slash((100% - #{$col * $container}), $container - 1) * #{$target - 1 + $addgutAmount}) + #{$col * $target}#{$negClose}#{$divClose});
 							} @else if unit($col) == unit($gut) { // If columns and gutters are fixed width and use the same units
-								@return (($col * $target) + ($gut * ($target - 1)) + $addgutAmount) * $negAmount / $divAmount;
+								@return math.div((($col * $target) + ($gut * ($target - 1)) + $addgutAmount) * $negAmount, $divAmount);
 							} @else { // If columns and gutters are fixed width and use different units
 								@return calc(#{$divOpen}#{$negOpen}#{($col * $target)} + #{($gut * ($target - 1)) + $addgutAmount}#{$negClose}#{$divClose});
 							}
 						} @else if unitless($gut) { // If columns are fluid width and gutters are fluid width
-							@return (percentage(fluid-width($target) / fluid-width($container)) + $addgutAmount) * $negAmount / $divAmount;
+							@return math.div((percentage(math.div(fluid-width($target), fluid-width($container))) + $addgutAmount) * $negAmount, $divAmount);
 						} @else { // If columns are fluid width and gutters are fixed width
-							@return calc(#{$divOpen}#{$negOpen}(((100% - #{$gut * ($container - 1)}) / #{$container}) * #{$target}) + #{($gut * ($target - 1)) + $addgutAmount}#{$negClose}#{$divClose});
+							@return calc(#{$divOpen}#{$negOpen}(list.slash((100% - #{$gut * ($container - 1)}), $container) * #{$target}) + #{($gut * ($target - 1)) + $addgutAmount}#{$negClose}#{$divClose});
 						}
 					} @else { // If the specified target is not "p", "g", or a unitless number
 						@warn invalid("colspan",$target,$container) + wrong-type("unitless number",$target) + ". " + $colspan-lesson;
@@ -525,11 +528,11 @@ $grid-lesson: "A 'grid' mixin call must include a valid class name, e.g. 'grid(c
 									$horiz-margin: 0;
 								} @else if unitless($mar) { // If margins are fluid width
 									@if unitless($col) and unitless($gut) { // If columns and gutters are fluid width
-										$horiz-margin: percentage($mar / (fluid-width(bp-attribute($bp, cols)) + ($mar * 2)));
+										$horiz-margin: percentage(math.div($mar, fluid-width(bp-attribute($bp, cols)) + ($mar * 2)));
 									} @else if unitless($col) { // If columns are fluid width and gutters are fixed width
-										$horiz-margin: calc((100% - #{(bp-attribute($bp, cols) - 1) * $gut}) * #{$mar / (($col * bp-attribute($bp, cols)) + ($mar * 2))});
+										$horiz-margin: calc((100% - #{(bp-attribute($bp, cols) - 1) * $gut}) * #{math.div($mar, ($col * bp-attribute($bp, cols)) + ($mar * 2))});
 									} @else if unitless($gut) { // If columns are fixed width and gutters are fluid width
-										$horiz-margin: calc((100% - #{bp-attribute($bp, cols) * $col}) * #{$mar / (($gut * (bp-attribute($bp, cols) - 1)) + ($mar * 2))});
+										$horiz-margin: calc((100% - #{bp-attribute($bp, cols) * $col}) * #{math.div($mar, ($gut * (bp-attribute($bp, cols) - 1)) + ($mar * 2))});
 									} @else { // If columns are fixed width and gutters are fixed width
 										@warn "For the margin to be fluid width, columns and/or gutters must also be fluid width. " + $more-info;
 										$horiz-margin: 0;
@@ -556,12 +559,12 @@ $grid-lesson: "A 'grid' mixin call must include a valid class name, e.g. 'grid(c
 									$min-width: $max-width;
 								} @else if unitless($mar) { // If margins are fluid width
 									@if unitless($col) and unitless($gut) { // If columns and gutters are fluid width
-										$min-width: ((($mar / (fluid-width(bp-attribute($bp-final, cols)) + ($mar * 2))) * $max-width) * 2) + $max-width;
+										$min-width: ((math.div($mar, fluid-width(bp-attribute($bp-final, cols)) + ($mar * 2)) * $max-width) * 2) + $max-width;
 									} @else if unitless($col) { // If columns are fluid width and gutters are fixed width
-										$min-width: calc(((#{$max-width} - #{(bp-attribute($bp-final, cols) - 1) * $gut}) * #{($mar * 2) / ((bp-attribute($bp-final, cols) * $col) + ($mar * 2))}) + #{$max-width});
+										$min-width: calc(((#{$max-width} - #{(bp-attribute($bp-final, cols) - 1) * $gut}) * #{math.div($mar * 2, (bp-attribute($bp-final, cols) * $col) + ($mar * 2))}) + #{$max-width});
 										@warn $chrome-warning;
 									} @else if unitless($gut) { // If columns are fixed width and gutters are fluid width
-										$min-width: calc(((#{$max-width} - #{bp-attribute($bp-final, cols) * $col}) * #{($mar * 2) / ((bp-attribute($bp-final, cols) * ($gut - 1)) + ($mar * 2))}) + #{$max-width});
+										$min-width: calc(((#{$max-width} - #{bp-attribute($bp-final, cols) * $col}) * #{math.div($mar * 2, (bp-attribute($bp-final, cols) * ($gut - 1)) + ($mar * 2))}) + #{$max-width});
 										@warn $chrome-warning;
 									}
 								} @else { // If margins are fixed width
