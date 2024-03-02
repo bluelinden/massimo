@@ -1,0 +1,39 @@
+@import 'src/lib/styles/colors.scss';
+
+@media screen and (prefers-color-scheme: light) {
+	html {
+		@include lightScheme;
+	}
+}
+
+@media screen and (prefers-color-scheme: dark) {
+	html {
+		@include darkScheme;
+	}
+}
+
+html.dark {
+	@include darkScheme;
+}
+
+html.light {
+	@include lightScheme;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+.layout {
+	min-height: 100vh;
+}
+
+html,
+body {
+	margin: 0;
+	min-width: 100vw;
+	min-height: 100vh;
+	font-family: 'Lexend', sans-serif;
+}
+
+@include grid(layout);

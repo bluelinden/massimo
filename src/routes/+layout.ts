@@ -1,8 +1,9 @@
 import GhostContentAPI from '@tryghost/content-api';
 import type { LayoutLoad } from './$types.js';
 
-export const load: LayoutLoad = async function load({ params }) {
+import '../app.scss';
 
+export const load: LayoutLoad = async function load({ params }) {
 	// content keys aren't necessarily secret, but it's still a god idea to not hardcode them here
 	const apiKey = import.meta.env.STATIC_GHOST_CONTENT_KEY as string;
 	const apiUrl = import.meta.env.STATIC_GHOST_API_URL as string;

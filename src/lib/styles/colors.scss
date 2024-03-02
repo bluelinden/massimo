@@ -1,0 +1,31 @@
+:root {
+	--darkPurple: #4b1128;
+	--midDarkPurple: #5c1a34;
+	--midLightPurple: #d5a5b6;
+	--lightPurple: #ead2d8;
+}
+
+@mixin lightScheme {
+	--fgColor: var(--darkPurple);
+	--bgColor: var(--lightPurple);
+	--fgFadedColor: var(--midDarkPurple);
+	--bgFadedColor: var(--midLightPurple);
+	background: var(--bgColor);
+	color: var(--fgColor);
+}
+
+@mixin darkScheme {
+	--fgColor: var(--lightPurple);
+	--bgColor: var(--darkPurple);
+	--fgFadedColor: var(--midLightPurple);
+	--bgFadedColor: var(--midDarkPurple);
+	background: var(--bgColor);
+	color: var(--fgColor);
+}
+
+
+
+$fg: var(--fgColor);
+$bg: var(--bgColor);
+$fgFaded: var(--fgFadedColor);
+$bgFaded: var(--bgFadedColor)

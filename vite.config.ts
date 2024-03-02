@@ -7,8 +7,10 @@ export default defineConfig({
 		preprocessorOptions: {
 			scss: {
 				additionalData: `
-				@import '$lib/styles/_column-setter.scss'
-				@import '$lib/styles/_column-settings.scss'
+				@import '$lib/styles/colors.scss';
+				@import '$lib/styles/borders.scss';
+				@import '$lib/styles/_column-settings.scss';
+				@import '$lib/styles/_column-setter.scss';
 			 `
 			}
 		}

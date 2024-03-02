@@ -1,0 +1,5 @@
+@mixin clickableBorder {
+	border-color: $bgFaded;
+	border-width: 2px;
+	border-style: solid;
+}
