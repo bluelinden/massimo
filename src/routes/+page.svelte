@@ -5,7 +5,3 @@
 	console.log(data);
 	data.api.posts.browse().then((posts) => posts.map((post) => console.log(post)))
 </script>
-
-<p>
-	
-</p>
